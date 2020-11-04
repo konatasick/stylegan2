@@ -7,6 +7,7 @@ from tensorflow.keras.utils import get_file
 from ffhq_dataset.face_alignment import image_align
 from ffhq_dataset.landmarks_detector import LandmarksDetector
 
+
 LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
 
 
@@ -24,12 +25,17 @@ if __name__ == "__main__":
     python align_images.py /raw_images /aligned_images
     """
 
-    landmarks_model_path = unpack_bz2(get_file('shape_predictor_68_face_landmarks.dat.bz2',
-                                               LANDMARKS_MODEL_URL, cache_subdir='temp'))
+    # landmarks_model_path = unpack_bz2(get_file('shape_predictor_68_face_landmarks.dat.bz2',
+    #                                            LANDMARKS_MODEL_URL, cache_subdir='temp'))
+    landmarks_model_path = '/data/yczhou/aivideo/GuangZhouRiBao/src_v2/preprocessing/util_face/model/shape_predictor_68_face_landmarks.dat'
     RAW_IMAGES_DIR = sys.argv[1]
     ALIGNED_IMAGES_DIR = sys.argv[2]
+    if (len(sys.argv))>3:
+        MODE = sys.argv[3]
+    else:
+        MODE = 'real'
 
-    landmarks_detector = LandmarksDetector(landmarks_model_path)
+    landmarks_detector = LandmarksDetector(landmarks_model_path, MODE)
     for img_name in [x for x in os.listdir(RAW_IMAGES_DIR) if x[0] not in '._']:
         raw_img_path = os.path.join(RAW_IMAGES_DIR, img_name)
         for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
