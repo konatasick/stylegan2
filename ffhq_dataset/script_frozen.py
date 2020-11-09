@@ -1,5 +1,23 @@
 import cv2
 import os
+
+# wget https://raw.githubusercontent.com/nagadomi/lbpcascade_animeface/master/lbpcascade_animeface.xml
+def viola_jones_anime(img, cascade_file = "./models/lbpcascade_animeface.xml"):
+    
+
+    if not os.path.isfile(cascade_file):
+        raise RuntimeError("%s: not found" % cascade_file)
+
+    cascade = cv2.CascadeClassifier(cascade_file)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.equalizeHist(gray)
+    
+    faces = cascade.detectMultiScale(gray,
+                                     # detector options
+                                     scaleFactor = 1.1,
+                                     minNeighbors = 5,
+                                     minSize = (24, 24))
+    return faces
     
 def viola_jones_combine(img, 
         class_face=cv2.CascadeClassifier(f"{cv2.data.haarcascades}haarcascade_frontalface_default.xml"), 
@@ -29,46 +47,3 @@ def viola_jones_combine(img,
 
 
 
-
-if __name__ == "__main__":
-
-    # classifiers
-    face_cascade = cv2.CascadeClassifier(f"{cv2.data.haarcascades}haarcascade_frontalface_default.xml")
-    eye_cascade = cv2.CascadeClassifier(f"{cv2.data.haarcascades}haarcascade_eye.xml")
-    face_dir = '/data2/kkwu/cartoon_face/frozen2013raw/'
-    output_dir = '../output/frozen2013raw/'
-    try:
-        os.system(f'rm ../output/frozen2013raw -rf')
-    except:
-        pass
-    os.makedirs(output_dir, exist_ok=True)
-
-    for filename in os.listdir(face_dir):
-        img = cv2.imread(f"{face_dir}{filename}")
-        if img is not None:
-            # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            # img = resize_img(img, 700)
-            faces = viola_jones_combine(img, face_cascade, eye_cascade)
-            if faces is not None:
-                for i, (x,y,w,h) in enumerate(faces):
-                    # img = cv2.rectangle(img, (x,y),(x+w, y+h), (4,8,170), 2)
-                    if h<100 or w<100:
-                        continue
-                    im_w, im_h = img.shape[:2]
-                    try:
-                        y_ = y - int(im_w/100*10)
-                        h_ = h + int(im_w/100*10)*2
-                        x_ = x - int(im_w/100*10)
-                        w_ = w + int(im_w/100*10)*2
-                        tmp_img = img[y_:y_+h_, x_:x_+w_, :]
-                        cv2.imwrite(f"{output_dir}{i}_{i+1}_{filename}", tmp_img)
-                        y_ = y - int(im_w/100*15)
-                        h_ = h + int(im_w/100*15)*2
-                        x_ = x - int(im_w/100*15)
-                        w_ = w + int(im_w/100*15)*2
-                        tmp_img = img[y_:y_+h_, x_:x_+w_, :]
-                        cv2.imwrite(f"{output_dir}{i}_{i+2}_{filename}", tmp_img)
-                    except:
-                        tmp_img = img[y:y+h, x:x+w, :]
-                        cv2.imwrite(f"{output_dir}{i}_{filename}", tmp_img)
-                    print(f'Saved {output_dir}{i}_{filename}.')
