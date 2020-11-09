@@ -52,7 +52,7 @@ def run(dataset, data_dir, result_dir, config_id, num_gpus, total_kimg, gamma, m
     train.mirror_augment_v = mirror_augment_v
     train.resume_with_new_nets = resume_with_new_nets
     train.image_snapshot_ticks = 1
-    train.network_snapshot_ticks = network_snapshot_ticks
+    train.network_snapshot_ticks = 1 #network_snapshot_ticks
     sched.G_lrate_base = sched.D_lrate_base = lr
     train.resume_pkl = resume_pkl
     
