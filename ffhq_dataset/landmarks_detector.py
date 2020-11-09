@@ -1,5 +1,5 @@
 import dlib
-from ffhq_dataset.script_frozen import viola_jones_combine
+from ffhq_dataset.script_frozen import viola_jones_combine, viola_jones_anime
 
 
 class LandmarksDetector:
@@ -27,7 +27,13 @@ class LandmarksDetector:
                 for i, (x,y,w,h) in enumerate(faces):
                     rect = dlib.rectangle(int(x), int(y), int(x+w), int(y+h))
                     dets.append(rect)
-
+        elif self.mode == 'anime':
+            dets = dlib.rectangles()
+            faces = viola_jones_anime(img[:,:,::-1])
+            if faces is not None:
+                for i, (x,y,w,h) in enumerate(faces):
+                    rect = dlib.rectangle(int(x), int(y), int(x+w), int(y+h))
+                    dets.append(rect)        
 
         for detection in dets:
             if detection.height() > 100 and detection.width() > 100:
